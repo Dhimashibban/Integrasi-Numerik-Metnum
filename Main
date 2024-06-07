@@ -1,0 +1,59 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+
+def f(x):
+    return 4 / (1 + x**2)
+
+def trapezoid_integration(N):
+    a, b = 0.0, 1.0
+    h = (b - a) / N
+    integral = 0.5 * (f(a) + f(b))
+    
+    for i in range(1, N):
+        integral += f(a + i * h)
+    
+    integral *= h
+    return integral
+
+pi_reference = 3.14159265358979323846
+N_values = [10, 100, 1000, 10000]
+
+results = []
+errors = []
+times = []
+
+for N in N_values:
+    start_time = time.time()
+    pi_estimate = trapezoid_integration(N)
+    end_time = time.time()
+    error = np.sqrt((pi_estimate - pi_reference)**2)
+    results.append(pi_estimate)
+    errors.append(error)
+    times.append(end_time - start_time)
+
+
+
+fig, ax1 = plt.subplots()
+
+color = 'tab:blue'
+ax1.set_xlabel('N')
+ax1.set_ylabel('Pi Estimate', color=color)
+ax1.plot(N_values, results, 'o-', color=color)
+ax1.tick_params(axis='y', labelcolor=color)
+
+ax2 = ax1.twinx()
+color = 'tab:red'
+ax2.set_ylabel('Error & Time (s)', color=color)
+ax2.plot(N_values, errors, 's--', color=color, label='Error')
+ax2.plot(N_values, times, 'd:', color='tab:green', label='Time')
+ax2.tick_params(axis='y', labelcolor=color)
+
+fig.tight_layout()
+fig.legend(loc="upper left", bbox_to_anchor=(0.15,0.85))
+plt.title('Pi Estimation using Trapezoid Integration')
+plt.xscale('log')
+plt.show()
+
+for i, N in enumerate(N_values):
+    print(f"N = {N}: Pi Estimate = {results[i]:.15f}, Error = {errors[i]:.15f}, Time = {times[i]:.6f} seconds")
